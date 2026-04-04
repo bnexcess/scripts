@@ -13,8 +13,8 @@ Add a Cronjob to use:
 	
 	 * * * * * bash /path/to/script/cf-phpfpm-attack-toggle.sh >> /var/log/cf-under-attack.log
 
-## Cloudflare/cf_uam.sh
+## Cloudflare/cf-uam.sh
 Script used to check the status/enable/disable under attack mode (uam)
 
-	$ bash ./cf_uam.sh -h
-	Usage: ./cf_uam.sh {status|enable|disable}
+	$ bash ./cf-uam.sh -h
+	Usage: ./cf-uam.sh {status|enable|disable}
