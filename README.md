@@ -10,5 +10,5 @@ Manage Account -> Account API Tokens -> Create Token
 Make sure to select Zone -> Zone Settings both (Edit/Read)
 
 Add a Cronjob to use:
-
-* * * * * bash /path/to/script/cf-phpfpm-attack-toggle.sh >> /var/log/cf-under-attack.log
+	
+	 * * * * * bash /path/to/script/cf-phpfpm-attack-toggle.sh >> /var/log/cf-under-attack.log
