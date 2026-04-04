@@ -16,3 +16,5 @@ Add a Cronjob to use:
 ## Cloudflare/cf_uam.sh
 Script used to check the status/enable/disable under attack mode (uam)
 
+	$ bash ./cf_uam.sh -h
+	Usage: ./cf_uam.sh {status|enable|disable}
