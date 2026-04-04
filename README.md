@@ -81,7 +81,7 @@ When adding a new script:
 
 ## License
 
-Free Use
+Free Use - Most scripts here are used in a RedHat/CentOS/Rocky Enviorment
 
 ---
 
