@@ -1,4 +1,4 @@
-# Scripts that can be useful under the right usage 
+# Cloudflare 
 
 ## Cloudflare/cf-phpfpm-attack-toggle.sh
 
