@@ -12,3 +12,7 @@ Make sure to select Zone -> Zone Settings both (Edit/Read)
 Add a Cronjob to use:
 	
 	 * * * * * bash /path/to/script/cf-phpfpm-attack-toggle.sh >> /var/log/cf-under-attack.log
+
+## Cloudflare/cf_uam.sh
+Script used to check the status/enable/disable under attack mode (uam)
+
