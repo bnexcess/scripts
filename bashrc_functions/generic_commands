@@ -1,0 +1,26 @@
+## Command to lookup ipinformation from SiteSentinels.com
+#Ex Usage: bs_ipinfo <ip>
+function bs_ipinfo () 
+{ 
+    curl -sk "https://www.sitesentinels.com/tools/bs_ipinfo/?ip=$1" -A"Agent $(whoami) - IPINFO API-Agent 007" | jq .
+}
+
+## Command to lookup ip information from SiteSentienls.com on a sorted list of ips with a count
+#Ex Usage: grep "2026:0[6-9]" /path/to/apache/log | awk '{print $1}' | sort | uniq -c | sort -rn | head |bs_iplog
+function bs_iplog () 
+{ 
+    while read line; do
+        _IPHITS=$(echo $line | awk '{print $1}');
+        _IP=$(echo $line | awk '{print $2}' | cut -d"-" -f1);
+        _IPRAW=$(curl -k --silent "https://www.sitesentinels.com/tools/bs_ipinfo/?ip=$_IP" -A"Agent $(whoami) - IPINFO API-Agent 007");
+        _IPC=$(echo $_IPRAW | jq -r .country_code);
+        _IPR=$(echo $_IPRAW | jq -r .country);
+        _IPH=$(echo $_IPRAW | jq -r .rdns);
+        _ABU=$(curl -s -G https://api.abuseipdb.com/api/v2/check   --data-urlencode "ipAddress=$_IP"   -d maxAgeInDays=90   -d verbose   -H "Key: ${ABUSEAPI}"   -H "Accept: application/json" | jq .data.abuseConfidenceScore);
+        _LOC2=$(echo $_IPRAW | jq -r .asn);
+        _LOC3=$(echo $_IPRAW | jq -r .as_name);
+        echo -e "$_IPHITS $_IP -- $_IPC $_IPR / $_LOC2 $_LOC3 -- $_IPH "-- Abuse Score: "$_ABU";
+    done
+}
+
+
