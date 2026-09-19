@@ -1,7 +1,13 @@
 #!/usr/bin/env bash
 #
-# cf-phpfpm-attack-toggle.sh
-# Toggle Cloudflare Under Attack mode based on PHP-FPM max_children usage.
+# cf-phpfpm-attack-toggle-v2.sh -v2.0.3
+# Simple tool used to Toggle Cloudflare Under Attack mode based on PHP-FPM max_children usage
+# with cool down to prevent flapping on attacks, it is all or nothing, it does not do a log review
+# to check which url is getting hit the most in an attack
+
+### USAGE ######## 
+# Add to your crontab
+# * * * * * bash /path/to/cf-phpfpm-attack-toggle-v2.sh >> ~/cf-phpfpm-attack.log
 
 ### CONFIG #########################################################
 
