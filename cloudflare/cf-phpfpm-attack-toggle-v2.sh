@@ -27,10 +27,11 @@ LOW_USAGE_PCT=50    # disable Under Attack if <= this % of max_children in use
 # stayed at/below LOW_USAGE_PCT continuously for this many seconds. Any
 # reading above LOW_USAGE_PCT while cooling down resets the timer.
 DISABLE_COOLDOWN_SECONDS=$((60 * 60 * 2))   # 2 hours
+#DISABLE_COOLDOWN_SECONDS=$((60 * 5))  # if less than 1 hour
 
 # State files to avoid flapping
-STATE_FILE="/var/run/cf_under_attack.state"
-BELOW_SINCE_FILE="/var/run/cf_under_attack.below_since"
+STATE_FILE="${HOME}/.cf_under_attack.${CF_DOMAIN}.state"
+BELOW_SINCE_FILE="${HOME}/.cf_under_attack.${CF_DOMAIN}.below_since"
 
 ####################################################################
 
