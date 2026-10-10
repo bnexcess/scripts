@@ -1,29 +1,45 @@
-# WP Slow Trace 1.0.0
+# WP Slow Trace v1.3.0
 
-Installable WordPress plugin (PHP 7.4+). Defaults: 2000 ms slow PHP threshold, 100 ms SQL threshold, 7 days retention, slow requests only, max 30 slow SQL entries per trace, max 10,000 traces retained. Administrators access **Tools → WP Slow Trace**.
+Self-contained WordPress slow-request diagnostics. No PHP-FPM configuration or WP-CLI imports required.
 
 ![WP Slow Trace Dashboard](image/dashboard-wp-slow-trace.png)
 
 ## Install
+1. Upload the ZIP through Plugins > Add New > Upload Plugin and activate.
+2. Optionally copy `mu-plugin/wp-slow-trace-bootstrap.php` to `wp-content/mu-plugins/` to collect SQL query timings. (For reliable query collection from earliest bootstrap, define `SAVEQUERIES` in wp-config.php; this incurs overhead.)
+3. Visit Tools > WP Slow Trace. Defaults: PHP 2000 ms, SQL 100 ms, retention 7 days, slow requests only.
 
-1. Upload the `wp-slow-trace` folder as a ZIP through **Plugins → Add New → Upload Plugin**, then activate. Alternatively extract it under `wp-content/plugins/` and activate.
-2. For SQL query timing, copy `mu-plugin/wp-slow-trace-bootstrap.php` to `wp-content/mu-plugins/wp-slow-trace-bootstrap.php` (create `mu-plugins` if needed). This must be a direct file, not nested inside a folder.
-3. Confirm `SAVEQUERIES` is not set to `false` in `wp-config.php` or elsewhere. For earliest query capture, define `SAVEQUERIES` as true in `wp-config.php` **before** WordPress bootstrap instead of relying on the MU file. Warning: query collection incurs overhead on every request, even fast ones; enable only for bounded diagnostic windows. Remove/disable `SAVEQUERIES` when not troubleshooting.
-4. Go to **Tools → WP Slow Trace**. The plugin automatically records requests taking at least 2 seconds and purges entries older than 7 days via WP-Cron. On low-traffic sites, WP-Cron may run late. For strict retention, schedule WP-Cron externally.
-5. For server-side PHP-FPM slow stack traces, follow `docs/PHP-FPM.md` and configure the correct PHP-FPM pool separately. No automatic FPM log ingestion is included.
+## PHP trace detail
+For completed slow requests, the dashboard includes WordPress lifecycle checkpoints (hook name, elapsed time since request start, memory) alongside SQL query caller information. These checkpoints are not function-level stack traces or exclusive callback timings. Requests hung indefinitely, native extension stalls, and arbitrary function-level execution cannot be traced solely from a conventional plugin.
 
-## Security / limitations
+## Production notes
+This plugin stores only paths without query strings, redacts SQL literals on a best-effort basis, and limits retained rows. SQL query callers can contain file paths. Restrict dashboard access to trusted administrators. SQL tracing uses WordPress SAVEQUERIES and adds overhead. WordPress cron cleanup runs when WordPress receives traffic. Test in staging first.
 
-- Only `manage_options` users can view/change traces; all actions use nonces. Query SQL string/number literals are masked best-effort. This is **not** a full SQL parser and cannot guarantee removal of all sensitive data (e.g., identifiers, comments, encoded data, unquoted values, caller strings). Treat stored traces as sensitive and restrict database backups/access.
-- Query capture is opt-in through `SAVEQUERIES`. Query collection has unavoidable memory/CPU overhead and captures all queries in PHP memory before the slow-only persistence decision. Avoid leaving it enabled indefinitely on high-traffic production sites.
-- Records store the path only (no URL query string, POST body, cookies, user identity, or IP). Some paths may still contain sensitive tokens or IDs. The SQL caller string may include filesystem paths.
-- Only completed/shutting-down PHP requests can write traces. Fatal errors may still reach shutdown; OOM, hard kill, worker crashes and blocked workers may not. For those, use PHP-FPM slowlogs and OS-level diagnostics.
-- `sql_total_ms` reflects queries visible to `$wpdb`, not direct PDO/mysqli calls. DB tracing includes the caller string from WordPress, not a full per-query PHP backtrace. Plugin does not implement continuous function-level PHP profiling; PHP-FPM slowlogs provide sampled PHP stack traces for slow workers.
-- Collection of SQL timings is unavailable if `SAVEQUERIES` was not enabled early enough. WordPress core and other plugins can alter query recording.
-- This version intentionally enforces **slow-only** mode, with no unrestricted capture-all mode.
-- Uninstalling/deactivating does not erase diagnostic records automatically. Use **Delete all traces** before uninstalling if desired.
+## Upgrading from v1.1
+Install this version over the previous version. The old PHP-FPM traces table is not dropped automatically, to avoid deleting existing data. If you previously installed PHP-FPM settings, remove those separately; they are no longer used.
 
-## Compatibility
+## WP-CLI commands (v1.3.0)
 
-WordPress 6.x, PHP 7.4+ (targeted; test in staging with your WordPress and PHP version). MariaDB/MySQL using WordPress `$wpdb`. Multisite creates tables per site on activation for that site; network-wide multisite activation and central reporting are not implemented.
-~                                                                                 
+Run from the WordPress installation directory after activating the plugin:
+
+```bash
+wp slow-trace status
+wp slow-trace report --since=24h --top=20
+wp slow-trace php --since=1h --top=20
+wp slow-trace sql --since=7d --top=20
+wp slow-trace hooks --since=24h --top=20
+wp slow-trace show 123
+wp slow-trace cleanup
+wp slow-trace report --since=24h --format=json
+wp slow-trace sql --since=1h --format=csv
+```
+
+`--since` accepts `h` (hours), `d` (days), or `w` (weeks), up to 365 days. `--top` accepts 1–500. `--format` accepts `table`, `json`, or `csv` for list commands. `show` supports `json` (default) or `table`. `status` supports `table`, `json`, or `csv`.
+
+Reports cover **stored, completed slow requests**, not active operating-system PHP processes. SQL reporting includes only slow SQL statements retained inside those recorded requests, and is limited by the per-request query cap. `hooks` displays elapsed WordPress lifecycle checkpoints, **not** per-hook exclusive execution time. A request may have slow SQL without being captured if its total PHP duration is below the PHP threshold. For query collection, install the optional MU bootstrap and verify `SAVEQUERIES` is enabled early enough; it adds overhead. `status` shows the SAVEQUERIES setting for the current CLI process, which may differ from web requests.
+
+For cron-based cleanup, WP-Cron already schedules cleanup. Optionally use `wp slow-trace cleanup` in a system cron, but no system cron is required.
+
+### Upgrading
+
+Upload the v1.3.0 ZIP over the existing plugin. Existing stored traces and settings are preserved. Test on staging before production. No database migration is required from v1.2.0.
