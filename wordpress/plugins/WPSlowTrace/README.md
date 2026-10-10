@@ -2,6 +2,8 @@
 
 Installable WordPress plugin (PHP 7.4+). Defaults: 2000 ms slow PHP threshold, 100 ms SQL threshold, 7 days retention, slow requests only, max 30 slow SQL entries per trace, max 10,000 traces retained. Administrators access **Tools → WP Slow Trace**.
 
+![WP Slow Trace Dashboard](image/dashboard-wp-slow-trace.png)
+
 ## Install
 
 1. Upload the `wp-slow-trace` folder as a ZIP through **Plugins → Add New → Upload Plugin**, then activate. Alternatively extract it under `wp-content/plugins/` and activate.
