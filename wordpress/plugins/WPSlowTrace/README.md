@@ -4,9 +4,7 @@
 
 Version **1.4.0** · Requires **PHP 7.4+** · No PHP-FPM configuration required
 
-<!-- Add an actual dashboard screenshot at images/dashboard.png, then uncomment:
-![WP Slow Trace dashboard](images/dashboard.png)
--->
+![WP Slow Trace Dashboard](image/dashboard-wp-slow-trace.png)
 
 WP Slow Trace records **completed slow WordPress requests** and helps investigate where time was spent. It can report total request duration, memory usage, SQL query timings, WordPress lifecycle checkpoints, instrumented action/filter callbacks, and outbound requests made through the WordPress HTTP API.
 
@@ -165,16 +163,6 @@ wp-slow-trace/
 │   └── wp-slow-trace-bootstrap.php
 └── README.md
 ```
-
-## Screenshots on GitHub
-
-To display an actual screenshot, add `images/dashboard.png` to the repository and replace the commented image block near the top of this README with:
-
-```markdown
-![WP Slow Trace Dashboard](image/dashboard-wp-slow-trace.png)
-```
-
-Commit both files. GitHub will display the screenshot automatically. Avoid publishing screenshots that expose private URLs, SQL data, or server paths.
 
 ## Limitations
 
